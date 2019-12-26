@@ -8,10 +8,13 @@ pub fn build(b: *Builder) void {
 
     var main_tests = b.addTest("src/main.zig");
     var growable_array_tests = b.addTest("src/growable_array.zig");
+    var zip_tests = b.addTest("src/zip.zig");
     main_tests.setBuildMode(mode);
     growable_array_tests.setBuildMode(mode);
+    zip_tests.setBuildMode(mode);
 
     const test_step = b.step("test", "Run library tests");
     test_step.dependOn(&main_tests.step);
     test_step.dependOn(&growable_array_tests.step);
+    test_step.dependOn(&zip_tests.step);
 }
