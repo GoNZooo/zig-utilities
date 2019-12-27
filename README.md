@@ -9,3 +9,6 @@
 
 - `zip.zig`; meant for interleaving/deinterleaving memory, probably a bad name
   choice.
+
+- `c_utilities.zig`; holds C utility functions that are good to have for C
+  interop.
