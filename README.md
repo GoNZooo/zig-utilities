@@ -12,3 +12,5 @@
 
 - `c_utilities.zig`; holds C utility functions that are good to have for C
   interop.
+
+- `string_utilities.zig`; holds string utility/convenience functions.
