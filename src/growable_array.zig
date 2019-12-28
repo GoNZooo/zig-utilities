@@ -71,7 +71,7 @@ pub fn GrowableArrayIterator(comptime T: type) type {
             }
         }
 
-        pub fn column(self: Self) usize {
+        pub fn position(self: Self) usize {
             return if (self.__current) |c| c else self.__starting_position;
         }
     };
@@ -429,3 +429,5 @@ test "`deleteCopy` deletes" {
     testing.expectEqualSlices(u8, string3.sliceConst(), "ho!");
     testing.expectEqual(string3.capacity, 3);
 }
+
+// @TODO: add iterator tests
