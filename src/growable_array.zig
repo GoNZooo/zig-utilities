@@ -308,6 +308,8 @@ pub fn GrowableArray(comptime T: type) type {
             };
         }
 
+        // @TODO: add iterator methods for splitting, a'la `mem.separate`
+
         pub fn isEmpty(self: Self) bool {
             return self.count == 0;
         }
