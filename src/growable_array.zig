@@ -49,6 +49,7 @@ pub fn GrowableArrayIterator(comptime T: type) type {
             }
         }
 
+        // @TODO: add `step` parameter for length of `next`
         pub fn peekNext(self: Self) ?T {
             if (self.__current) |current| {
                 return if (current + 1 >= self.__max_length) null else self.__data[current + 1];
@@ -57,6 +58,7 @@ pub fn GrowableArrayIterator(comptime T: type) type {
             }
         }
 
+        // @TODO: add `step` parameter for length of `previous`
         pub fn peekPrevious(self: Self) ?T {
             if (self.__current) |current| {
                 if (current > 0) {
