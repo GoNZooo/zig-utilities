@@ -292,7 +292,7 @@ pub fn GrowableArray(comptime T: type) type {
         }
 
         /// Creates an iterator starting from `position` in the array.
-        pub fn iteratorAt(self: Self, position: usize) GrowableArrayIterator(T) {
+        pub fn iteratorFrom(self: Self, position: usize) GrowableArrayIterator(T) {
             return GrowableArrayIterator(T){
                 .__current = null,
                 .__starting_position = column,
