@@ -281,7 +281,7 @@ pub fn GrowableArray(comptime T: type) type {
             return self.__chars[0..self.count];
         }
 
-        pub fn iteratorConst(self: Self) GrowableArrayIterator(T) {
+        pub fn iterator(self: Self) GrowableArrayIterator(T) {
             return GrowableArrayIterator(T){
                 .__starting_position = 0,
                 .__current = null,
