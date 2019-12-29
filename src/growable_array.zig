@@ -295,7 +295,7 @@ pub fn GrowableArray(comptime T: type) type {
         pub fn iteratorFrom(self: Self, position: usize) GrowableArrayIterator(T) {
             return GrowableArrayIterator(T){
                 .__current = null,
-                .__starting_position = column,
+                .__starting_position = position,
                 .__max_length = self.count,
                 .__data = self.__chars,
             };
