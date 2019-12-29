@@ -281,6 +281,7 @@ pub fn GrowableArray(comptime T: type) type {
             return self.__chars[0..self.count];
         }
 
+        /// Creates an iterator starting from the beginning of the array.
         pub fn iterator(self: Self) GrowableArrayIterator(T) {
             return GrowableArrayIterator(T){
                 .__starting_position = 0,
@@ -290,7 +291,8 @@ pub fn GrowableArray(comptime T: type) type {
             };
         }
 
-        pub fn iteratorAt(self: Self, column: usize) GrowableArrayIterator(T) {
+        /// Creates an iterator starting from `position` in the array.
+        pub fn iteratorAt(self: Self, position: usize) GrowableArrayIterator(T) {
             return GrowableArrayIterator(T){
                 .__current = null,
                 .__starting_position = column,
@@ -299,6 +301,7 @@ pub fn GrowableArray(comptime T: type) type {
             };
         }
 
+        /// Creates an iterator starting from the end of the array.
         pub fn iteratorFromEnd(self: Self) GrowableArrayIterator(T) {
             return GrowableArrayIterator(T){
                 .__current = null,
