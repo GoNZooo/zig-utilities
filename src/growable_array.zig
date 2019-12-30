@@ -435,4 +435,81 @@ test "`deleteCopy` deletes" {
     testing.expectEqual(string3.capacity, 3);
 }
 
-// @TODO: add iterator tests
+test "`.iterator()` works" {
+    var array = try GrowableArray(u8).init(std.heap.page_allocator, GrowableArrayInitOptions{});
+    try array.append(&[_]u8{1});
+    try array.append(&[_]u8{ 2, 3 });
+    try array.append(&[_]u8{4});
+
+    var expected: u8 = 1;
+    var it = array.iterator();
+    while (it.next()) |x| {
+        testing.expectEqual(x, expected);
+        expected += 1;
+    }
+}
+
+test "`.iteratorFromEnd()` works" {
+    var array = try GrowableArray(u8).init(std.heap.page_allocator, GrowableArrayInitOptions{});
+    try array.append(&[_]u8{1});
+    try array.append(&[_]u8{ 2, 3 });
+    try array.append(&[_]u8{4});
+
+    var expected: u8 = 4;
+    var it = array.iteratorFromEnd();
+    while (it.previous()) |x| {
+        testing.expectEqual(x, expected);
+        expected -= 1;
+    }
+}
+
+test "`.iteratorFrom()` works" {
+    var array = try GrowableArray(u8).init(std.heap.page_allocator, GrowableArrayInitOptions{});
+    try array.append(&[_]u8{1});
+    try array.append(&[_]u8{ 2, 3 });
+    try array.append(&[_]u8{4});
+
+    var expected: u8 = 3;
+    var it = array.iteratorFrom(2);
+    while (it.next()) |x| {
+        testing.expectEqual(x, expected);
+        expected += 1;
+    }
+}
+
+test "`.iteratorFrom()` works backwards" {
+    var array = try GrowableArray(u8).init(std.heap.page_allocator, GrowableArrayInitOptions{});
+    try array.append(&[_]u8{1});
+    try array.append(&[_]u8{ 2, 3 });
+    try array.append(&[_]u8{4});
+
+    var expected: u8 = 3;
+    var it = array.iteratorFrom(2);
+    while (it.previous()) |x| {
+        testing.expectEqual(x, expected);
+        expected -= 1;
+    }
+}
+
+test "`.peek` methods work" {
+    var array = try GrowableArray(u8).init(std.heap.page_allocator, GrowableArrayInitOptions{});
+    try array.append(&[_]u8{1});
+    try array.append(&[_]u8{ 2, 3 });
+    try array.append(&[_]u8{4});
+
+    var expected: u8 = 3;
+    var it = array.iteratorFrom(2);
+    while (it.next()) |x| {
+        testing.expectEqual(x, expected);
+        const current = it.peek();
+        const next = it.peekNext();
+        const previous = it.peekPrevious();
+        testing.expectEqual(current, x);
+        testing.expectEqual(previous, x - 1);
+        if (next) |n| {
+            testing.expectEqual(n, x + 1);
+        }
+
+        expected += 1;
+    }
+}
