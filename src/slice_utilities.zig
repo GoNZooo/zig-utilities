@@ -2,10 +2,11 @@ const std = @import("std");
 const mem = std.mem;
 const testing = std.testing;
 
+/// Filters a slice of `T` and puts the result into a new allocated and resized slice.
 pub fn filterSlice(
     comptime T: type,
     allocator: *mem.Allocator,
-    slice: []T,
+    slice: []const T,
     predicate: fn (x: T) bool,
 ) ![]T {
     var filtered = try allocator.alloc(T, slice.len);
