@@ -506,6 +506,7 @@ test "`.peek` methods work" {
         const previous = it.peekPrevious();
         testing.expectEqual(current, x);
         testing.expectEqual(previous, x - 1);
+        testing.expectEqual(it.position(), x - 1);
         if (next) |n| {
             testing.expectEqual(n, x + 1);
         }
