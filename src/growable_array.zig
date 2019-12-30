@@ -24,7 +24,7 @@ pub fn GrowableArrayIterator(comptime T: type) type {
         __starting_position: usize,
 
         pub fn next(self: *Self) ?T {
-            self.__current = if (self.__current) |c| c + 1 else 0;
+            self.__current = if (self.__current) |c| c + 1 else self.__starting_position;
 
             return if (self.__current.? >= self.__max_length) null else self.__data[self.__current.?];
         }
