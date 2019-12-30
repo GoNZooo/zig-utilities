@@ -3,6 +3,7 @@ const mem = std.mem;
 const testing = std.testing;
 
 /// Filters a slice of `T` and puts the result into a new allocated and resized slice.
+/// The caller is responsible for freeing the associated memory.
 pub fn filterSlice(
     comptime T: type,
     allocator: *mem.Allocator,
