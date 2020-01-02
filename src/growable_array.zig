@@ -105,7 +105,7 @@ pub fn GrowableArray(comptime T: type) type {
             options: GrowableArrayInitOptions,
         ) !GrowableArray(T) {
             const capacity = if (options.initial_capacity) |c| c else 0;
-            var chars = try allocator.alloc(T, capacity);
+            const chars = try allocator.alloc(T, capacity);
 
             return Self{
                 .__chars = chars,
@@ -129,7 +129,7 @@ pub fn GrowableArray(comptime T: type) type {
         /// const array value.
         /// The caller is responsible for calling `successful_return_value.deinit()`.
         pub fn copyConst(allocator: *mem.Allocator, slice: ConstSlice) !Self {
-            var chars = try mem.dupe(allocator, T, slice);
+            const chars = try mem.dupe(allocator, T, slice);
 
             return Self{
                 .__chars = chars,
@@ -160,7 +160,7 @@ pub fn GrowableArray(comptime T: type) type {
         /// it. The copy will ignore the capacity of the original array.
         /// The caller is responsible for calling `successful_return_value.deinit()`.
         pub fn appendCopy(self: Self, allocator: *mem.Allocator, slice: ConstSlice) !Self {
-            var chars = try mem.concat(
+            const chars = try mem.concat(
                 allocator,
                 T,
                 &[_][]const T{ self.__chars[0..self.count], slice },
@@ -206,7 +206,7 @@ pub fn GrowableArray(comptime T: type) type {
             slice: ConstSlice,
         ) !Self {
             const capacity = self.count + slice.len;
-            var characters = try allocator.alloc(T, self.count + slice.len);
+            const characters = try allocator.alloc(T, self.count + slice.len);
             const slice_to_copy_forward = self.__chars[position..self.count];
             const new_start_position = position + slice.len;
             mem.copy(T, characters[0..position], self.__chars[0..position]);
@@ -255,7 +255,7 @@ pub fn GrowableArray(comptime T: type) type {
             assert(start <= end);
             const slice_to_remove = self.__chars[start..end];
             const slice_after_removed_space = self.__chars[end..self.count];
-            var characters = try allocator.alloc(T, self.count - slice_to_remove.len);
+            const characters = try allocator.alloc(T, self.count - slice_to_remove.len);
 
             mem.copy(T, characters[0..start], self.__chars[0..start]);
             mem.copy(T, characters[start..], slice_after_removed_space);
@@ -271,7 +271,7 @@ pub fn GrowableArray(comptime T: type) type {
         /// Returns a mutable copy of the contents of the `GrowableArray(T)`.
         /// caller is responsible for calling `successful_return_value.deinit()`.
         pub fn sliceCopy(self: Self, allocator: *mem.Allocator) !Slice {
-            var chars = try mem.dupe(allocator, T, self.__chars[0..self.count]);
+            const chars = try mem.dupe(allocator, T, self.__chars[0..self.count]);
 
             return chars;
         }

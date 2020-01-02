@@ -28,7 +28,7 @@ pub fn filter(
     slice: []const T,
     predicate: fn (x: T) bool,
 ) ![]T {
-    var filtered = try allocator.alloc(T, slice.len);
+    const filtered = try allocator.alloc(T, slice.len);
     var matching: usize = 0;
     for (slice) |x| {
         if (predicate(x)) {
@@ -51,7 +51,7 @@ pub fn map(
     as: []const A,
     f: fn (x: A) B,
 ) ![]B {
-    var bs = try allocator.alloc(B, as.len);
+    const bs = try allocator.alloc(B, as.len);
 
     for (as) |a, i| {
         bs[i] = f(a);

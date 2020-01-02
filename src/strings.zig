@@ -13,7 +13,7 @@ pub fn splitIntoLines(allocator: *mem.Allocator, string: []const u8) ![]const []
     var newline_iterator = mem.separate(string, "\n");
 
     while (newline_iterator.next()) |line| {
-        var trimmed_line = mem.trim(u8, line, "\n\r");
+        const trimmed_line = mem.trim(u8, line, "\n\r");
         if (!mem.eql(u8, trimmed_line, "")) (try lines.append(trimmed_line));
     }
 
