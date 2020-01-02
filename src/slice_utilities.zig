@@ -2,6 +2,24 @@ const std = @import("std");
 const mem = std.mem;
 const testing = std.testing;
 
+/// Determines whether a predicate `p` is true for all members of a slice.
+pub fn all(comptime T: type, ts: []const T, p: fn (t: T) bool) bool {
+    for (ts) |t| {
+        if (!p(t)) return false;
+    }
+
+    return true;
+}
+
+/// Determines whether a predicate `p` is true for any member of a slice.
+pub fn any(comptime T: type, ts: []const T, p: fn (t: T) bool) bool {
+    for (ts) |t| {
+        if (p(t)) return true;
+    }
+
+    return false;
+}
+
 /// Filters a slice of `T` and puts the result into a new allocated and resized slice.
 /// The caller is responsible for freeing the allocated memory.
 pub fn filter(
@@ -57,8 +75,32 @@ test "`map` works" {
     testing.expectEqualSlices(bool, mappedIsEven, &[_]bool{ false, true, false, true, false });
 }
 
+test "`all` works" {
+    const slice = &[_]u32{ 1, 2, 3, 4, 5 };
+    const even = try filter(u32, std.heap.page_allocator, slice, isEven);
+    testing.expect(all(u32, even, isEven));
+    testing.expect(!all(u32, even, isOdd));
+}
+
+test "`any` works" {
+    const slice = &[_]u32{ 1, 2, 3, 4, 5 };
+    const even = try filter(u32, std.heap.page_allocator, slice, isEven);
+    testing.expect(any(u32, even, isEven));
+    testing.expect(!any(u32, even, isOdd));
+    testing.expect(any(u32, slice, isOne));
+    testing.expect(!any(u32, even, isOne));
+}
+
 fn isEven(x: u32) bool {
     return x % 2 == 0;
+}
+
+fn isOdd(x: u32) bool {
+    return x % 2 == 1;
+}
+
+fn isOne(x: u32) bool {
+    return x == 1;
 }
 
 fn addOne(x: u32) u32 {
