@@ -1,4 +1,9 @@
-const Builder = @import("std").build.Builder;
+const std = @import("std");
+const builtin = std.builtin;
+const Builder = std.build.Builder;
+const Step = std.build.Step;
+
+const files = [_][]const u8{ "main", "growable_array", "strings", "slices", "c" };
 
 pub fn build(b: *Builder) void {
     const mode = b.standardReleaseOptions();
@@ -6,21 +11,15 @@ pub fn build(b: *Builder) void {
     lib.setBuildMode(mode);
     lib.install();
 
-    var main_tests = b.addTest("src/main.zig");
-    var growable_array_tests = b.addTest("src/growable_array.zig");
-    var zip_tests = b.addTest("src/zip.zig");
-    var string_utilities_tests = b.addTest("src/string_utilities.zig");
-    var slice_utilities_tests = b.addTest("src/slice_utilities.zig");
-    main_tests.setBuildMode(mode);
-    growable_array_tests.setBuildMode(mode);
-    zip_tests.setBuildMode(mode);
-    string_utilities_tests.setBuildMode(mode);
-    slice_utilities_tests.setBuildMode(mode);
-
     const test_step = b.step("test", "Run library tests");
-    test_step.dependOn(&main_tests.step);
-    test_step.dependOn(&growable_array_tests.step);
-    test_step.dependOn(&zip_tests.step);
-    test_step.dependOn(&string_utilities_tests.step);
-    test_step.dependOn(&slice_utilities_tests.step);
+
+    addTests(b, mode, test_step);
+}
+
+fn addTests(b: *Builder, mode: builtin.Mode, test_step: *Step) void {
+    inline for (files) |file| {
+        var file_test = b.addTest("src/" ++ file ++ ".zig");
+        file_test.setBuildMode(mode);
+        test_step.dependOn(&file_test.step);
+    }
 }

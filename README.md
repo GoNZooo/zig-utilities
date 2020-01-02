@@ -7,10 +7,9 @@
   characteristics I wanted (like initial capacity specification on `init` as
   well as sliced additions, not just single `append`s, etc.)
 
-- `zip.zig`; meant for interleaving/deinterleaving memory, probably a bad name
-  choice.
-
-- `c_utilities.zig`; holds C utility functions that are good to have for C
+- `c.zig`; holds C utility functions that are good to have for C
   interop.
 
-- `string_utilities.zig`; holds string utility/convenience functions.
+- `strings.zig`; holds string utility/convenience functions.
+
+- `slices.zig`; holds general slice utility functions
