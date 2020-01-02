@@ -3,18 +3,18 @@ const mem = std.mem;
 const testing = std.testing;
 
 /// Determines whether a predicate `p` is true for all members of a slice.
-pub fn all(comptime T: type, ts: []const T, p: fn (t: T) bool) bool {
+pub fn all(comptime T: type, ts: []const T, predicate: fn (t: T) bool) bool {
     for (ts) |t| {
-        if (!p(t)) return false;
+        if (!predicate(t)) return false;
     }
 
     return true;
 }
 
 /// Determines whether a predicate `p` is true for any member of a slice.
-pub fn any(comptime T: type, ts: []const T, p: fn (t: T) bool) bool {
+pub fn any(comptime T: type, ts: []const T, predicate: fn (t: T) bool) bool {
     for (ts) |t| {
-        if (p(t)) return true;
+        if (predicate(t)) return true;
     }
 
     return false;
