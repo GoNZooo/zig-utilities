@@ -2,7 +2,7 @@ const std = @import("std");
 const mem = std.mem;
 const testing = std.testing;
 
-/// Determines whether a predicate `p` is true for all members of a slice.
+/// Determines whether a predicate is true for all members of a slice.
 pub fn all(comptime T: type, ts: []const T, predicate: fn (t: T) bool) bool {
     for (ts) |t| {
         if (!predicate(t)) return false;
@@ -11,7 +11,7 @@ pub fn all(comptime T: type, ts: []const T, predicate: fn (t: T) bool) bool {
     return true;
 }
 
-/// Determines whether a predicate `p` is true for any member of a slice.
+/// Determines whether a predicate is true for any member of a slice.
 pub fn any(comptime T: type, ts: []const T, predicate: fn (t: T) bool) bool {
     for (ts) |t| {
         if (predicate(t)) return true;
