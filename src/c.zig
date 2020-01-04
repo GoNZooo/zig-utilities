@@ -17,6 +17,7 @@ const TestStruct = struct {
     f: ?fn () void,
 };
 
+/// Takes a void pointer ant casts it to another pointer type.
 pub fn castVoidPointer(comptime T: type, ptr: ?*c_void) T {
     return @intToPtr(T, @ptrToInt(ptr));
 }
