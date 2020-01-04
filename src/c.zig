@@ -17,10 +17,19 @@ const TestStruct = struct {
     f: ?fn () void,
 };
 
+pub fn castVoidPointer(comptime T: type, ptr: ?*c_void) T {
+    return @intToPtr(T, @ptrToInt(ptr));
+}
+
 test "`zeroed` zeroes struct" {
     const zeroed_test_struct = zeroed(TestStruct);
     testing.expectEqual(zeroed_test_struct.x, 0.0);
     testing.expectEqual(zeroed_test_struct.y, 0);
     testing.expectEqual(zeroed_test_struct.c, 0);
     testing.expectEqual(zeroed_test_struct.f, null);
+}
+
+test "`castVoidPointer` works" {
+    const t_pointer = castVoidPointer(*TestStruct, @intToPtr(*c_void, @alignOf(TestStruct) * 42));
+    const null_t_pointer = castVoidPointer(?*TestStruct, null);
 }
