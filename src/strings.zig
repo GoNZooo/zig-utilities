@@ -10,14 +10,14 @@ const ArrayList = std.ArrayList;
 /// The caller is responsible for calling `allocator.free()` when they're done with the memory.
 pub fn splitIntoLines(allocator: *mem.Allocator, string: []const u8) ![]const []const u8 {
     var lines = ArrayList([]const u8).init(allocator);
-    var newline_iterator = mem.separate(string, "\n");
+    var newline_iterator = mem.split(string, "\n");
 
     while (newline_iterator.next()) |line| {
         const trimmed_line = mem.trim(u8, line, "\n\r");
         if (!mem.eql(u8, trimmed_line, "")) (try lines.append(trimmed_line));
     }
 
-    return lines.toSliceConst();
+    return lines.items;
 }
 
 test "`splitIntoLines` splits into lines" {

@@ -1,6 +1,6 @@
 const std = @import("std");
 const testing = std.testing;
-const direct_allocator = std.heap.direct_allocator;
+const page_allocator = std.heap.page_allocator;
 const mem = std.mem;
 const fmt = std.fmt;
 const rand = std.rand;
@@ -319,13 +319,11 @@ pub fn GrowableArray(comptime T: type) type {
 
         pub fn format(
             self: Self,
-            comptime format_string: []const u8,
+            comptime formatting: []const u8,
             options: fmt.FormatOptions,
-            context: var,
-            comptime Errors: type,
-            output: fn (context: @TypeOf(context), format_string: []const u8) Errors!void,
-        ) Errors!void {
-            return fmt.format(context, Errors, output, "{}", .{self.__chars[0..self.count]});
+            out_stream: var,
+        ) !void {
+            return fmt.format(out_stream, "{}", .{self.__chars[0..self.count]});
         }
 
         fn getRequiredCapacity(self: Self, slice: ConstSlice) usize {
@@ -336,7 +334,7 @@ pub fn GrowableArray(comptime T: type) type {
 
 test "`append` with an already high enough capacity doesn't change capacity" {
     const initial_capacity = 80;
-    var string = try GrowableArray(u8).init(direct_allocator, GrowableArrayInitOptions{
+    var string = try GrowableArray(u8).init(page_allocator, GrowableArrayInitOptions{
         .initial_capacity = initial_capacity,
     });
 
@@ -351,7 +349,7 @@ test "`append` with an already high enough capacity doesn't change capacity" {
 
 test "`appendCopy` doesn't bring unused space with it" {
     const initial_capacity = 80;
-    var string = try GrowableArray(u8).init(direct_allocator, GrowableArrayInitOptions{
+    var string = try GrowableArray(u8).init(page_allocator, GrowableArrayInitOptions{
         .initial_capacity = initial_capacity,
     });
 
@@ -359,16 +357,16 @@ test "`appendCopy` doesn't bring unused space with it" {
     testing.expectEqual(string.capacity, initial_capacity);
 
     const added_slice = "hello";
-    const string2 = try string.appendCopy(direct_allocator, added_slice);
+    const string2 = try string.appendCopy(page_allocator, added_slice);
     testing.expectEqual(string2.capacity, added_slice.len);
     testing.expectEqual(string2.count, added_slice.len);
     testing.expectEqualSlices(u8, string2.sliceConst(), added_slice);
 }
 
 test "`appendCopy` doesn't disturb original string, `copyConst` copies static strings" {
-    var string2 = try GrowableArray(u8).copyConst(direct_allocator, "hello");
+    var string2 = try GrowableArray(u8).copyConst(page_allocator, "hello");
     try string2.append(" there");
-    var string3 = try string2.appendCopy(direct_allocator, "wat");
+    var string3 = try string2.appendCopy(page_allocator, "wat");
 
     testing.expectEqualSlices(
         u8,
@@ -384,7 +382,7 @@ test "`appendCopy` doesn't disturb original string, `copyConst` copies static st
 }
 
 test "`insertSlice` inserts a string into an already created string" {
-    var string = try GrowableArray(u8).copyConst(direct_allocator, "hello!");
+    var string = try GrowableArray(u8).copyConst(page_allocator, "hello!");
     try string.insertSlice(5, "lo");
     testing.expectEqualSlices(u8, string.sliceConst(), "hellolo!");
     try string.insertSlice(5, ", bo");
@@ -392,31 +390,31 @@ test "`insertSlice` inserts a string into an already created string" {
 }
 
 test "`insertSliceCopy` inserts a string into a copy of a `GrowableArray`" {
-    var string = try GrowableArray(u8).copyConst(direct_allocator, "hello!");
-    const string2 = try string.insertSliceCopy(direct_allocator, 5, "lo");
+    var string = try GrowableArray(u8).copyConst(page_allocator, "hello!");
+    const string2 = try string.insertSliceCopy(page_allocator, 5, "lo");
     testing.expectEqualSlices(u8, string2.sliceConst(), "hellolo!");
-    const string3 = try string2.insertSliceCopy(direct_allocator, 5, ", bo");
+    const string3 = try string2.insertSliceCopy(page_allocator, 5, ", bo");
     testing.expectEqualSlices(u8, string3.sliceConst(), "hello, bolo!");
 }
 
 test "`delete` deletes" {
-    var string = try GrowableArray(u8).copyConst(direct_allocator, "hello!");
+    var string = try GrowableArray(u8).copyConst(page_allocator, "hello!");
     string.delete(1, 4, DeleteOptions{});
     testing.expectEqualSlices(u8, string.sliceConst(), "ho!");
     testing.expectEqual(string.capacity, 6);
 }
 
 test "`delete` deletes and shrinks if given the option" {
-    var string = try GrowableArray(u8).copyConst(direct_allocator, "hello!");
+    var string = try GrowableArray(u8).copyConst(page_allocator, "hello!");
     string.delete(1, 4, DeleteOptions{ .shrink = true });
     testing.expectEqualSlices(u8, string.sliceConst(), "ho!");
     testing.expectEqual(string.capacity, 3);
 }
 
 test "`format` returns a custom format instead of everything" {
-    var string2 = try GrowableArray(u8).copyConst(direct_allocator, "hello");
+    var string2 = try GrowableArray(u8).copyConst(page_allocator, "hello");
     var format_output = try fmt.allocPrint(
-        direct_allocator,
+        page_allocator,
         "{}! {}!",
         .{ string2, @as(u1, 1) },
     );
@@ -425,12 +423,12 @@ test "`format` returns a custom format instead of everything" {
 }
 
 test "`deleteCopy` deletes" {
-    var string = try GrowableArray(u8).copyConst(direct_allocator, "hello, bolo!");
-    const string2 = try string.deleteCopy(direct_allocator, 1, 4);
+    var string = try GrowableArray(u8).copyConst(page_allocator, "hello, bolo!");
+    const string2 = try string.deleteCopy(page_allocator, 1, 4);
     testing.expectEqualSlices(u8, string2.sliceConst(), "ho, bolo!");
     testing.expectEqual(string2.capacity, 9);
 
-    const string3 = try string2.deleteCopy(direct_allocator, 2, 8);
+    const string3 = try string2.deleteCopy(page_allocator, 2, 8);
     testing.expectEqualSlices(u8, string3.sliceConst(), "ho!");
     testing.expectEqual(string3.capacity, 3);
 }
